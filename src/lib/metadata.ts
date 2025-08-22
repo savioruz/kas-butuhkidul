@@ -1,13 +1,14 @@
 export const siteConfig = {
-	name: 'sv',
+	name: 'Kas Butuh Kidul',
 	logo: '/favicon.svg',
-	description: '@TODO - Replace with your site description',
-	keywords: '@TODO - Replace with your site keywords',
-	url: new URL('https://example.com'), // @TODO - Replace with your site URL
-	ogImage: new URL('https://example.com/og.png'), // @TODO - Replace with your Open Graph image URL
+	description:
+		'Kas Butuh Kidul is a personal finance management app designed to help you track your income and expenses effectively.',
+	keywords: 'finance, income, expenses, budgeting',
+	url: new URL('https://kas.butuhkidul.my.id'),
+	ogImage: new URL('https://kas.butuhkidul.my.id/og.png'),
 	links: {
-		twitter: new URL('https://twitter.com/example'), // @TODO - Replace with your Twitter URL
-		github: new URL('https://github.com/example') // @TODO - Replace with your GitHub URL
+		twitter: new URL('https://twitter.com/butuhkidul'),
+		github: new URL('https://github.com/savioruz/kas-butuhkidul')
 	},
 	googleVerification: '@TODO - Replace with your Google verification code',
 	yandexVerification: '@TODO - Replace with your Yandex verification code'
