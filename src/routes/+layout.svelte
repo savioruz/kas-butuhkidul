@@ -17,7 +17,7 @@
 	let isI18nReady = $state(false);
 
 	onMount(async () => {
-		const targetLocale = data?.locale || 'en';
+		const targetLocale = data?.locale || 'id';
 
 		await loadTranslations(targetLocale, 'common');
 		await loadTranslations(targetLocale, 'navigation');
@@ -68,10 +68,8 @@
 	{#if isI18nReady}
 		<Navbar />
 	{/if}
-	<main class="flex min-h-screen flex-col items-center justify-center py-8">
-		<div
-			class="flex w-full max-w-sm flex-col items-center justify-center px-4 md:max-w-screen-md md:px-0"
-		>
+	<main class="flex min-h-screen flex-col">
+		<div class="flex w-full flex-col items-center justify-center px-4">
 			{@render children()}
 		</div>
 	</main>

@@ -7,5 +7,66 @@
 	"not_found": "I'm sorry, but the page you're looking for doesn't exist.",
 	"back_to_home": "Back to Home",
 	"language": "Language",
-	"logo": "🇺🇸"
+	"logo": "🇺🇸",
+	"balance": "Balance",
+	"income": "Income",
+	"expense": "Expense",
+	"transaction_summary": "Transaction Summary",
+	"failed_to_load_summary": "Failed to load transaction summary",
+	"loading_transactions": "Loading transactions...",
+	"no_transactions_found": "No transactions found",
+	"all": "All",
+	"month": "This Month",
+	"year": "This Year",
+	"none": "All Time",
+	"status": {
+		"active": "Active",
+		"inactive": "Inactive"
+	},
+	"transaction": {
+		"fields": {
+			"date": "Date",
+			"type": "Type",
+			"category": "Category",
+			"description": "Description",
+			"active": "Status",
+			"amount_idr": "Amount (IDR)",
+			"actions": "Actions"
+		},
+		"types": {
+			"income": "Income",
+			"expense": "Expense"
+		},
+		"actions": {
+			"view_proof": "View Proof",
+			"close": "Close"
+		},
+		"proof": {
+			"dialog_title": "Transaction Proof",
+			"failed_to_load": "Failed to load image",
+			"open_in_new_tab": "Open in New Tab",
+			"no_proof_available": "No proof available"
+		}
+	},
+	"filters": {
+		"type": "Filter by Type",
+		"period": "Filter by Period",
+		"category": "Filter by Category",
+		"items_per_page": "Items per Page",
+		"select_category": "Select category...",
+		"search_category": "Search category...",
+		"no_category_found": "No category found.",
+		"total_transactions": "Total Transactions",
+		"reset": "Reset Filters"
+	},
+	"pagination": {
+		"previous": "Previous",
+		"next": "Next",
+		"page_info": "Page {current} of {total}"
+	},
+	"home": {
+		"title": "Butuh Kidul Financial Overview",
+		"detail": "Financial Details",
+		"hint": "Select filter options to view specific transactions."
+	}
 }

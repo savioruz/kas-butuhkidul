@@ -7,5 +7,66 @@
 	"not_found": "Maaf, halaman yang Anda cari tidak ada.",
 	"back_to_home": "Kembali ke Beranda",
 	"language": "Bahasa",
-	"logo": "🇮🇩"
+	"logo": "🇮🇩",
+	"balance": "Saldo",
+	"income": "Pemasukan",
+	"expense": "Pengeluaran",
+	"transaction_summary": "Ringkasan Transaksi",
+	"failed_to_load_summary": "Gagal memuat ringkasan transaksi",
+	"loading_transactions": "Memuat transaksi...",
+	"no_transactions_found": "Tidak ada transaksi ditemukan",
+	"all": "Semua",
+	"month": "Bulan Ini",
+	"year": "Tahun Ini",
+	"none": "Sepanjang Waktu",
+	"status": {
+		"active": "Aktif",
+		"inactive": "Tidak Aktif"
+	},
+	"transaction": {
+		"fields": {
+			"date": "Tanggal",
+			"type": "Jenis",
+			"category": "Kategori",
+			"description": "Deskripsi",
+			"active": "Status",
+			"amount_idr": "Jumlah (IDR)",
+			"actions": "Aksi"
+		},
+		"types": {
+			"income": "Pemasukan",
+			"expense": "Pengeluaran"
+		},
+		"actions": {
+			"view_proof": "Lihat Bukti",
+			"close": "Tutup"
+		},
+		"proof": {
+			"dialog_title": "Bukti Transaksi",
+			"failed_to_load": "Gagal memuat gambar",
+			"open_in_new_tab": "Buka di Tab Baru",
+			"no_proof_available": "Tidak ada bukti tersedia"
+		}
+	},
+	"filters": {
+		"type": "Filter berdasarkan Jenis",
+		"period": "Filter berdasarkan Periode",
+		"category": "Filter berdasarkan Kategori",
+		"items_per_page": "Item per Halaman",
+		"select_category": "Pilih kategori...",
+		"search_category": "Cari kategori...",
+		"no_category_found": "Kategori tidak ditemukan.",
+		"total_transactions": "Total Transaksi",
+		"reset": "Reset Filter"
+	},
+	"pagination": {
+		"previous": "Sebelumnya",
+		"next": "Selanjutnya",
+		"page_info": "Halaman {current} dari {total}"
+	},
+	"home": {
+		"title": "Kas Keuangan Butuh Kidul",
+		"detail": "Rincian Keuangan",
+		"hint": "Pilih opsi filter untuk melihat transaksi tertentu."
+	}
 }
