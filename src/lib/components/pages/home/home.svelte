@@ -18,7 +18,7 @@
 	</section>
 	<!-- Detail Section -->
 	<section class="mt-8 py-2 sm:py-4 lg:py-6">
-		<h1 class="text-start text-2xl font-bold">
+		<h1 class="px-3 text-start text-2xl font-bold">
 			{$t('common.home.detail')}
 		</h1>
 	</section>
