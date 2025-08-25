@@ -46,7 +46,6 @@
 		{$t('common.no_transactions_found')}
 	</div>
 {:else}
-	<!-- Responsive table wrapper with horizontal scroll -->
 	<div class="w-full overflow-hidden rounded-md border">
 		<div class="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-x-auto">
 			<table class="w-full text-sm">

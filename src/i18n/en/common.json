@@ -19,6 +19,10 @@
 	"month": "This Month",
 	"year": "This Year",
 	"none": "All Time",
+	"this_month": "This Month",
+	"this_year": "This Year",
+	"last_month": "Last Month",
+	"last_year": "Last Year",
 	"status": {
 		"active": "Active",
 		"inactive": "Inactive"

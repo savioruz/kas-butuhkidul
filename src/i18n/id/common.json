@@ -19,6 +19,10 @@
 	"month": "Bulan Ini",
 	"year": "Tahun Ini",
 	"none": "Sepanjang Waktu",
+	"this_month": "Bulan ini",
+	"this_year": "Tahun ini",
+	"last_month": "Bulan kemarin",
+	"last_year": "Tahun kemarin",
 	"status": {
 		"active": "Aktif",
 		"inactive": "Tidak Aktif"

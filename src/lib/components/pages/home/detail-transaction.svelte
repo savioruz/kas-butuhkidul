@@ -11,6 +11,8 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import CheckIcon from 'lucide-svelte/icons/check';
 	import ChevronsUpDownIcon from 'lucide-svelte/icons/chevrons-up-down';
+	import ChevronLeftIcon from 'lucide-svelte/icons/chevron-left';
+	import ChevronRightIcon from 'lucide-svelte/icons/chevron-right';
 	import { cn } from '$lib/utils';
 	import type {
 		Transaction,
@@ -25,7 +27,7 @@
 	let isLoading = false;
 	let error: string | null = null;
 	let selectedType: 'all' | 'income' | 'expense' = 'all';
-	let selectedPeriod: 'none' | 'month' | 'year' = 'none';
+	let selectedPeriod: 'none' | 'this_month' | 'last_month' | 'this_year' | 'last_year' = 'none';
 	let selectedCategory = '';
 	let currentPage = 1;
 	let totalPages = 1;
@@ -107,10 +109,17 @@
 		const currentMonth = now.getMonth() + 1;
 
 		switch (selectedPeriod) {
-			case 'month':
+			case 'this_month':
 				return `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
-			case 'year':
+			case 'last_month': {
+				const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+				const lastMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+				return `${lastMonthYear}-${lastMonth.toString().padStart(2, '0')}`;
+			}
+			case 'this_year':
 				return currentYear.toString();
+			case 'last_year':
+				return (currentYear - 1).toString();
 			default:
 				return undefined;
 		}
@@ -148,12 +157,12 @@
 		}
 	}
 
-	function selectPeriod(period: 'none' | 'month' | 'year') {
-		selectedPeriod = period;
-		if (!isInitialLoad) {
-			currentPage = 1;
-			fetchTransactions();
-		}
+	function changePeriod(
+		newPeriod: 'none' | 'this_month' | 'last_month' | 'this_year' | 'last_year'
+	) {
+		selectedPeriod = newPeriod;
+		currentPage = 1;
+		fetchTransactions();
 	}
 
 	function changeItemsPerPage(newLimit: number) {
@@ -191,9 +200,7 @@
 
 <Card class="w-full max-w-none overflow-hidden">
 	<CardContent class="space-y-6 p-3 sm:p-6">
-		<!-- Filters -->
 		<div class="space-y-4">
-			<!-- Type Filter -->
 			<div class="space-y-2">
 				<p class="text-sm font-medium">{$t('common.filters.type')}</p>
 				<div class="flex flex-wrap gap-2">
@@ -229,44 +236,22 @@
 				</div>
 			</div>
 
-			<!-- Period Filter -->
 			<div class="space-y-2">
 				<p class="text-sm font-medium">{$t('common.filters.period')}</p>
-				<div class="flex flex-wrap gap-2">
-					<Badge
-						variant={selectedPeriod === 'none' ? 'default' : 'outline'}
-						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {selectedPeriod ===
-						'none'
-							? ''
-							: 'hover:bg-muted'}"
-						onclick={() => selectPeriod('none')}
-					>
-						{$t('common.none')}
-					</Badge>
-					<Badge
-						variant={selectedPeriod === 'month' ? 'default' : 'outline'}
-						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {selectedPeriod ===
-						'month'
-							? ''
-							: 'hover:bg-muted'}"
-						onclick={() => selectPeriod('month')}
-					>
-						{$t('common.month')}
-					</Badge>
-					<Badge
-						variant={selectedPeriod === 'year' ? 'default' : 'outline'}
-						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {selectedPeriod ===
-						'year'
-							? ''
-							: 'hover:bg-muted'}"
-						onclick={() => selectPeriod('year')}
-					>
-						{$t('common.year')}
-					</Badge>
-				</div>
+				<select
+					id="period-filter"
+					bind:value={selectedPeriod}
+					on:change={() => changePeriod(selectedPeriod)}
+					class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-[200px]"
+				>
+					<option value="none">{$t('common.none')}</option>
+					<option value="this_month">{$t('common.this_month')}</option>
+					<option value="last_month">{$t('common.last_month')}</option>
+					<option value="this_year">{$t('common.this_year')}</option>
+					<option value="last_year">{$t('common.last_year')}</option>
+				</select>
 			</div>
 
-			<!-- Category Filter -->
 			<div class="space-y-2">
 				<p class="text-sm font-medium">{$t('common.filters.category')}</p>
 				<Popover.Root bind:open>
@@ -334,7 +319,6 @@
 				</Popover.Root>
 			</div>
 
-			<!-- Items Per Page -->
 			<div class="space-y-2">
 				<label for="items-per-page" class="text-sm font-medium"
 					>{$t('common.filters.items_per_page')}</label
@@ -351,7 +335,6 @@
 				</select>
 			</div>
 
-			<!-- Reset Button -->
 			<div class="flex justify-start">
 				<Button variant="outline" onclick={resetFilters} size="sm">
 					{$t('common.filters.reset')}
@@ -379,26 +362,50 @@
 						class="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
 					>
 						<p class="text-center text-sm text-muted-foreground sm:text-left">
-							Page {currentPage} of {totalPages}
+							Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(
+								currentPage * itemsPerPage,
+								totalData
+							)} of {totalData} transactions
 						</p>
-						<div class="flex justify-center gap-2 sm:justify-end">
+						<div class="flex items-center justify-center gap-2 sm:justify-end">
 							<Button
 								variant="outline"
 								size="sm"
 								onclick={prevPage}
 								disabled={currentPage === 1}
-								class="flex-1 sm:flex-none"
+								class="h-8 w-8 p-0"
 							>
-								{$t('common.pagination.previous')}
+								<ChevronLeftIcon class="h-4 w-4" />
 							</Button>
+
+							<div class="flex items-center gap-1">
+								{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page (page)}
+									{#if page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)}
+										<Button
+											variant={page === currentPage ? 'default' : 'outline'}
+											size="sm"
+											onclick={() => {
+												currentPage = page;
+												fetchTransactions();
+											}}
+											class="h-8 w-8 p-0"
+										>
+											{page}
+										</Button>
+									{:else if page === currentPage - 2 || page === currentPage + 2}
+										<span class="px-2 text-muted-foreground">...</span>
+									{/if}
+								{/each}
+							</div>
+
 							<Button
 								variant="outline"
 								size="sm"
 								onclick={nextPage}
 								disabled={currentPage === totalPages}
-								class="flex-1 sm:flex-none"
+								class="h-8 w-8 p-0"
 							>
-								{$t('common.pagination.next')}
+								<ChevronRightIcon class="h-4 w-4" />
 							</Button>
 						</div>
 					</div>
