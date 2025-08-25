@@ -1,7 +1,16 @@
+const baseUrl = import.meta.env.VITE_BASE_URL || '/';
+const domainTrimmed = baseUrl.replace(/(^\w+:|^)\/\//, '').replace(/\/+$/, '');
+
 export interface NavItem {
 	href: string;
 	label: string;
 	translationKey: string;
 }
 
-export const navigationConfig: NavItem[] = [];
+export const navigationConfig: NavItem[] = [
+	{
+		href: `https://dash.${domainTrimmed}`,
+		label: 'Dashboard',
+		translationKey: 'dashboard'
+	}
+];
