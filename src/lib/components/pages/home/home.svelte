@@ -23,7 +23,7 @@
 		</h1>
 	</section>
 	<section class="py-2 sm:py-4 lg:py-6">
-		<div class="mx-auto w-[320px] md:w-[512px] lg:w-full">
+		<div class="mx-auto w-[360px] md:w-[512px] lg:w-full">
 			<DetailTransaction />
 		</div>
 	</section>

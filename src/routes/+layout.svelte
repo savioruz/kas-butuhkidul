@@ -69,7 +69,7 @@
 		<Navbar />
 	{/if}
 	<main class="flex min-h-screen flex-col">
-		<div class="flex w-full flex-col items-center justify-center px-4">
+		<div class="flex w-full flex-col items-center justify-center">
 			{@render children()}
 		</div>
 	</main>
