@@ -27,6 +27,13 @@
 		"active": "Aktif",
 		"inactive": "Tidak Aktif"
 	},
+	"transactions": "Transaksi",
+	"summary": {
+		"title": "Ringkasan Transaksi",
+		"positive": "Surplus",
+		"negative": "Defisit",
+		"net_balance": "Saldo Bersih"
+	},
 	"transaction": {
 		"fields": {
 			"date": "Tanggal",

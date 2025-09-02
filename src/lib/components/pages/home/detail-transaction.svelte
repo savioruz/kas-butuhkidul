@@ -42,6 +42,25 @@
 
 	$: selectedCategoryName = categories.find((c) => c.name === selectedCategory)?.name || '';
 
+	// Calculate sums from current transactions
+	$: totalIncome = transactions
+		.filter((t) => t.type === 'income' && t.active)
+		.reduce((sum, t) => sum + t.amount, 0);
+
+	$: totalExpense = transactions
+		.filter((t) => t.type === 'expense' && t.active)
+		.reduce((sum, t) => sum + t.amount, 0);
+
+	$: netBalance = totalIncome - totalExpense;
+
+	function formatCurrency(amount: number): string {
+		return new Intl.NumberFormat('id-ID', {
+			style: 'currency',
+			currency: 'IDR',
+			minimumFractionDigits: 0
+		}).format(amount);
+	}
+
 	function closeAndFocusTrigger() {
 		open = false;
 		tick().then(() => {
@@ -319,22 +338,6 @@
 				</Popover.Root>
 			</div>
 
-			<div class="space-y-2">
-				<label for="items-per-page" class="text-sm font-medium"
-					>{$t('common.filters.items_per_page')}</label
-				>
-				<select
-					id="items-per-page"
-					bind:value={itemsPerPage}
-					on:change={() => changeItemsPerPage(itemsPerPage)}
-					class="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-				>
-					{#each paginationOptions as option (option)}
-						<option value={option}>{option}</option>
-					{/each}
-				</select>
-			</div>
-
 			<div class="flex justify-start">
 				<Button variant="outline" onclick={resetFilters} size="sm">
 					{$t('common.filters.reset')}
@@ -350,16 +353,40 @@
 					<Button variant="outline" onclick={fetchTransactions} class="mt-4">Retry</Button>
 				</div>
 			{:else}
-				<p class="text-sm text-muted-foreground">
-					{totalData}
-					{$t('common.filters.total_transactions')}
-				</p>
+				<div class="flex flex-row justify-between">
+					<p class="text-xs text-muted-foreground md:text-sm">
+						{totalData}
+						{$t('common.filters.total_transactions')}
+					</p>
+					<p class="text-xs text-muted-foreground md:text-sm">
+						<span class={cn(netBalance >= 0 ? 'text-green-600' : 'text-red-600')}>
+							{formatCurrency(netBalance)}
+						</span>
+						{$t('common.summary.net_balance')}
+					</p>
+				</div>
 				<TransactionList {transactions} {isLoading} />
 
 				<!-- Pagination -->
+				<div class="space-y-2">
+					<label for="items-per-page" class="text-sm font-medium"
+						>{$t('common.filters.items_per_page')}</label
+					>
+					<select
+						id="items-per-page"
+						bind:value={itemsPerPage}
+						on:change={() => changeItemsPerPage(itemsPerPage)}
+						class="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+					>
+						{#each paginationOptions as option (option)}
+							<option value={option}>{option}</option>
+						{/each}
+					</select>
+				</div>
+
 				{#if totalPages > 1}
 					<div
-						class="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+						class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
 					>
 						<p class="text-center text-sm text-muted-foreground sm:text-left">
 							Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(

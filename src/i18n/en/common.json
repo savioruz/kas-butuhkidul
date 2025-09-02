@@ -27,6 +27,13 @@
 		"active": "Active",
 		"inactive": "Inactive"
 	},
+	"transactions": "Transactions",
+	"summary": {
+		"title": "Transaction Summary",
+		"positive": "Surplus",
+		"negative": "Deficit",
+		"net_balance": "Net Balance"
+	},
 	"transaction": {
 		"fields": {
 			"date": "Date",
