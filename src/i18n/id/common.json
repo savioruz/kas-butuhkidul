@@ -68,7 +68,25 @@
 		"search_category": "Cari kategori...",
 		"no_category_found": "Kategori tidak ditemukan.",
 		"total_transactions": "Total Transaksi",
-		"reset": "Reset Filter"
+		"reset": "Reset Filter",
+		"apply": "Terapkan Filter",
+		"quick_periods": "Periode Cepat",
+		"months": "Bulan",
+		"years": "Tahun"
+	},
+	"months": {
+		"january": "Januari",
+		"february": "Februari",
+		"march": "Maret",
+		"april": "April",
+		"may": "Mei",
+		"june": "Juni",
+		"july": "Juli",
+		"august": "Agustus",
+		"september": "September",
+		"october": "Oktober",
+		"november": "November",
+		"december": "Desember"
 	},
 	"pagination": {
 		"previous": "Sebelumnya",

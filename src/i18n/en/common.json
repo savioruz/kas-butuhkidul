@@ -68,7 +68,25 @@
 		"search_category": "Search category...",
 		"no_category_found": "No category found.",
 		"total_transactions": "Total Transactions",
-		"reset": "Reset Filters"
+		"reset": "Reset Filters",
+		"apply": "Apply Filters",
+		"quick_periods": "Quick Periods",
+		"months": "Months",
+		"years": "Years"
+	},
+	"months": {
+		"january": "January",
+		"february": "February",
+		"march": "March",
+		"april": "April",
+		"may": "May",
+		"june": "June",
+		"july": "July",
+		"august": "August",
+		"september": "September",
+		"october": "October",
+		"november": "November",
+		"december": "December"
 	},
 	"pagination": {
 		"previous": "Previous",

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount, tick, onDestroy } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { t } from '$lib/i18n';
 	import { API_BASE_URL } from '$lib/types/api';
@@ -27,20 +27,92 @@
 	let isLoading = false;
 	let error: string | null = null;
 	let selectedType: 'all' | 'income' | 'expense' = 'all';
-	let selectedPeriod: 'none' | 'this_month' | 'last_month' | 'this_year' | 'last_year' = 'none';
+	let selectedPeriod:
+		| 'none'
+		| 'this_month'
+		| 'last_month'
+		| 'this_year'
+		| 'last_year'
+		| 'january'
+		| 'february'
+		| 'march'
+		| 'april'
+		| 'may'
+		| 'june'
+		| 'july'
+		| 'august'
+		| 'september'
+		| 'october'
+		| 'november'
+		| 'december'
+		| string = 'none';
 	let selectedCategory = '';
 	let currentPage = 1;
 	let totalPages = 1;
 	let totalData = 0;
 	let itemsPerPage = 10;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let isInitialLoad = true;
 
 	let open = false;
 	let triggerRef: HTMLButtonElement | null = null;
+	let categorySearchTerm = '';
+	let isLoadingCategories = false;
+
+	let periodOpen = false;
+	let periodTriggerRef: HTMLButtonElement | null = null;
+
+	// Track pending filter changes (not yet applied)
+	let pendingType: 'all' | 'income' | 'expense' = 'all';
+	let pendingPeriod: string = 'none';
+	let pendingCategory = '';
+	let pendingItemsPerPage = 10;
 
 	const paginationOptions = [5, 10, 20, 50, 100];
 
-	$: selectedCategoryName = categories.find((c) => c.name === selectedCategory)?.name || '';
+	// Period options for the dropdown
+	const periodOptions = [
+		{ value: 'none', label: 'common.none' },
+		{ value: 'this_month', label: 'common.this_month' },
+		{ value: 'last_month', label: 'common.last_month' },
+		{ value: 'this_year', label: 'common.this_year' },
+		{ value: 'last_year', label: 'common.last_year' },
+		{ value: 'january', label: 'common.months.january' },
+		{ value: 'february', label: 'common.months.february' },
+		{ value: 'march', label: 'common.months.march' },
+		{ value: 'april', label: 'common.months.april' },
+		{ value: 'may', label: 'common.months.may' },
+		{ value: 'june', label: 'common.months.june' },
+		{ value: 'july', label: 'common.months.july' },
+		{ value: 'august', label: 'common.months.august' },
+		{ value: 'september', label: 'common.months.september' },
+		{ value: 'october', label: 'common.months.october' },
+		{ value: 'november', label: 'common.months.november' },
+		{ value: 'december', label: 'common.months.december' }
+	] as const;
+
+	// Generate year options starting from 2025 up to current year only
+	const currentYear = new Date().getFullYear();
+	const startYear = 2025;
+	const endYear = currentYear; // Only show up to current year
+	const yearOptions =
+		endYear >= startYear
+			? Array.from({ length: endYear - startYear + 1 }, (_, i) => {
+					const year = startYear + i;
+					return { value: year.toString(), label: year.toString() };
+				})
+			: []; // If current year is before 2025, show no years
+
+	$: selectedCategoryName = categories.find((c) => c.name === pendingCategory)?.name || '';
+	$: selectedPeriodLabel = (() => {
+		// Check if it's a specific year
+		if (pendingPeriod.match(/^\d{4}$/) && parseInt(pendingPeriod) >= 2025) {
+			return pendingPeriod; // Return the year as is
+		}
+		// Find in period options
+		const found = periodOptions.find((p) => p.value === pendingPeriod);
+		return found ? found.label : 'common.none';
+	})();
 
 	// Calculate sums from current transactions
 	$: totalIncome = transactions
@@ -65,6 +137,13 @@
 		open = false;
 		tick().then(() => {
 			triggerRef?.focus();
+		});
+	}
+
+	function closeAndFocusPeriodTrigger() {
+		periodOpen = false;
+		tick().then(() => {
+			periodTriggerRef?.focus();
 		});
 	}
 
@@ -139,9 +218,46 @@
 				return currentYear.toString();
 			case 'last_year':
 				return (currentYear - 1).toString();
+			case 'january':
+				return `${currentYear}-01`;
+			case 'february':
+				return `${currentYear}-02`;
+			case 'march':
+				return `${currentYear}-03`;
+			case 'april':
+				return `${currentYear}-04`;
+			case 'may':
+				return `${currentYear}-05`;
+			case 'june':
+				return `${currentYear}-06`;
+			case 'july':
+				return `${currentYear}-07`;
+			case 'august':
+				return `${currentYear}-08`;
+			case 'september':
+				return `${currentYear}-09`;
+			case 'october':
+				return `${currentYear}-10`;
+			case 'november':
+				return `${currentYear}-11`;
+			case 'december':
+				return `${currentYear}-12`;
 			default:
+				// Check if it's a specific year (e.g., "2025", "2026", etc.)
+				if (selectedPeriod.match(/^\d{4}$/)) {
+					return selectedPeriod;
+				}
 				return undefined;
 		}
+	}
+
+	function applyFilters() {
+		selectedType = pendingType;
+		selectedPeriod = pendingPeriod;
+		selectedCategory = pendingCategory;
+		itemsPerPage = pendingItemsPerPage;
+		currentPage = 1;
+		fetchTransactions();
 	}
 
 	function nextPage() {
@@ -164,35 +280,47 @@
 		selectedCategory = '';
 		currentPage = 1;
 		itemsPerPage = 10;
+
+		// Also reset pending filters
+		pendingType = 'all';
+		pendingPeriod = 'none';
+		pendingCategory = '';
+		pendingItemsPerPage = 10;
+
 		transactions = [];
 		fetchTransactions();
 	}
 
 	function selectType(type: 'all' | 'income' | 'expense') {
-		selectedType = type;
-		if (!isInitialLoad) {
-			currentPage = 1;
-			fetchTransactions();
-		}
+		pendingType = type;
 	}
 
-	function changePeriod(
-		newPeriod: 'none' | 'this_month' | 'last_month' | 'this_year' | 'last_year'
-	) {
-		selectedPeriod = newPeriod;
-		currentPage = 1;
-		fetchTransactions();
+	function changePeriod(newPeriod: string) {
+		pendingPeriod = newPeriod;
+	}
+
+	function changeCategory(newCategory: string) {
+		pendingCategory = newCategory;
 	}
 
 	function changeItemsPerPage(newLimit: number) {
-		itemsPerPage = newLimit;
-		currentPage = 1;
-		fetchTransactions();
+		pendingItemsPerPage = newLimit;
 	}
 
-	async function fetchCategories() {
+	async function fetchCategories(searchTerm = '') {
 		try {
-			const response = await fetch(`${API_BASE_URL}/v1/categories?active=true`);
+			isLoadingCategories = true;
+			const params = new SvelteURLSearchParams();
+			params.append('active', 'true');
+
+			if (!searchTerm.trim()) {
+				params.append('limit', '25');
+			} else {
+				params.append('name', searchTerm.trim());
+			}
+
+			const url = `${API_BASE_URL}/v1/categories?${params.toString()}`;
+			const response = await fetch(url);
 
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
@@ -208,12 +336,36 @@
 		} catch (err) {
 			console.error('Error fetching categories:', err);
 			categories = [];
+		} finally {
+			isLoadingCategories = false;
 		}
+	}
+
+	// Debounced search function for category search
+	let searchTimeout: number | null = null;
+	function handleCategorySearch(term: string) {
+		categorySearchTerm = term;
+
+		// Clear previous timeout
+		if (searchTimeout) {
+			clearTimeout(searchTimeout);
+		}
+
+		// Debounce search by 300ms
+		searchTimeout = setTimeout(() => {
+			fetchCategories(term);
+		}, 300);
 	}
 
 	onMount(() => {
 		fetchCategories();
 		fetchTransactions();
+	});
+
+	onDestroy(() => {
+		if (searchTimeout) {
+			clearTimeout(searchTimeout);
+		}
 	});
 </script>
 
@@ -224,8 +376,8 @@
 				<p class="text-sm font-medium">{$t('common.filters.type')}</p>
 				<div class="flex flex-wrap gap-2">
 					<Badge
-						variant={selectedType === 'all' ? 'default' : 'outline'}
-						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {selectedType ===
+						variant={pendingType === 'all' ? 'default' : 'outline'}
+						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {pendingType ===
 						'all'
 							? ''
 							: 'hover:bg-muted'}"
@@ -234,8 +386,8 @@
 						{$t('common.all')}
 					</Badge>
 					<Badge
-						variant={selectedType === 'income' ? 'default' : 'outline'}
-						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {selectedType ===
+						variant={pendingType === 'income' ? 'default' : 'outline'}
+						class="cursor-pointer px-3 py-1 transition-colors hover:bg-primary/80 {pendingType ===
 						'income'
 							? ''
 							: 'hover:bg-muted'}"
@@ -244,8 +396,8 @@
 						{$t('common.income')}
 					</Badge>
 					<Badge
-						variant={selectedType === 'expense' ? 'destructive' : 'outline'}
-						class="cursor-pointer px-3 py-1 transition-colors {selectedType === 'expense'
+						variant={pendingType === 'expense' ? 'destructive' : 'outline'}
+						class="cursor-pointer px-3 py-1 transition-colors {pendingType === 'expense'
 							? ''
 							: 'hover:bg-muted'}"
 						onclick={() => selectType('expense')}
@@ -257,23 +409,151 @@
 
 			<div class="space-y-2">
 				<p class="text-sm font-medium">{$t('common.filters.period')}</p>
-				<select
-					id="period-filter"
-					bind:value={selectedPeriod}
-					on:change={() => changePeriod(selectedPeriod)}
-					class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-[200px]"
-				>
-					<option value="none">{$t('common.none')}</option>
-					<option value="this_month">{$t('common.this_month')}</option>
-					<option value="last_month">{$t('common.last_month')}</option>
-					<option value="this_year">{$t('common.this_year')}</option>
-					<option value="last_year">{$t('common.last_year')}</option>
-				</select>
+				<Popover.Root bind:open={periodOpen}>
+					<Popover.Trigger bind:ref={periodTriggerRef}>
+						{#snippet child({ props })}
+							<Button
+								variant="outline"
+								class="w-full justify-between sm:w-[200px]"
+								{...props}
+								role="combobox"
+								aria-expanded={periodOpen}
+							>
+								{$t(selectedPeriodLabel)}
+								<ChevronsUpDownIcon class="ml-2 size-4 shrink-0 opacity-50" />
+							</Button>
+						{/snippet}
+					</Popover.Trigger>
+					<Popover.Content class="w-full p-0 sm:w-[200px]">
+						<Command.Root>
+							<Command.List>
+								<Command.Group heading={$t('common.filters.quick_periods')}>
+									<Command.Item
+										value="none"
+										onSelect={() => {
+											changePeriod('none');
+											closeAndFocusPeriodTrigger();
+										}}
+									>
+										<CheckIcon
+											class={cn('mr-2 size-4', pendingPeriod !== 'none' && 'text-transparent')}
+										/>
+										{$t('common.none')}
+									</Command.Item>
+									<Command.Item
+										value="this_month"
+										onSelect={() => {
+											changePeriod('this_month');
+											closeAndFocusPeriodTrigger();
+										}}
+									>
+										<CheckIcon
+											class={cn(
+												'mr-2 size-4',
+												pendingPeriod !== 'this_month' && 'text-transparent'
+											)}
+										/>
+										{$t('common.this_month')}
+									</Command.Item>
+									<Command.Item
+										value="last_month"
+										onSelect={() => {
+											changePeriod('last_month');
+											closeAndFocusPeriodTrigger();
+										}}
+									>
+										<CheckIcon
+											class={cn(
+												'mr-2 size-4',
+												pendingPeriod !== 'last_month' && 'text-transparent'
+											)}
+										/>
+										{$t('common.last_month')}
+									</Command.Item>
+									<Command.Item
+										value="this_year"
+										onSelect={() => {
+											changePeriod('this_year');
+											closeAndFocusPeriodTrigger();
+										}}
+									>
+										<CheckIcon
+											class={cn('mr-2 size-4', pendingPeriod !== 'this_year' && 'text-transparent')}
+										/>
+										{$t('common.this_year')}
+									</Command.Item>
+									<Command.Item
+										value="last_year"
+										onSelect={() => {
+											changePeriod('last_year');
+											closeAndFocusPeriodTrigger();
+										}}
+									>
+										<CheckIcon
+											class={cn('mr-2 size-4', pendingPeriod !== 'last_year' && 'text-transparent')}
+										/>
+										{$t('common.last_year')}
+									</Command.Item>
+								</Command.Group>
+								<Command.Separator />
+								<Command.Group heading={$t('common.filters.months')}>
+									{#each periodOptions.slice(5) as period (period.value)}
+										<Command.Item
+											value={period.value}
+											onSelect={() => {
+												changePeriod(period.value);
+												closeAndFocusPeriodTrigger();
+											}}
+										>
+											<CheckIcon
+												class={cn(
+													'mr-2 size-4',
+													pendingPeriod !== period.value && 'text-transparent'
+												)}
+											/>
+											{$t(period.label)}
+										</Command.Item>
+									{/each}
+								</Command.Group>
+								{#if yearOptions.length > 0}
+									<Command.Separator />
+									<Command.Group heading={$t('common.filters.years')}>
+										{#each yearOptions as year (year.value)}
+											<Command.Item
+												value={year.value}
+												onSelect={() => {
+													changePeriod(year.value);
+													closeAndFocusPeriodTrigger();
+												}}
+											>
+												<CheckIcon
+													class={cn(
+														'mr-2 size-4',
+														pendingPeriod !== year.value && 'text-transparent'
+													)}
+												/>
+												{year.label}
+											</Command.Item>
+										{/each}
+									</Command.Group>
+								{/if}
+							</Command.List>
+						</Command.Root>
+					</Popover.Content>
+				</Popover.Root>
 			</div>
 
 			<div class="space-y-2">
 				<p class="text-sm font-medium">{$t('common.filters.category')}</p>
-				<Popover.Root bind:open>
+				<Popover.Root
+					bind:open
+					onOpenChange={(isOpen) => {
+						if (isOpen) {
+							categorySearchTerm = '';
+							fetchCategories();
+						}
+					}}
+				>
 					<Popover.Trigger bind:ref={triggerRef}>
 						{#snippet child({ props })}
 							<Button
@@ -290,57 +570,67 @@
 					</Popover.Trigger>
 					<Popover.Content class="w-full p-0 sm:w-[200px]">
 						<Command.Root>
-							<Command.Input placeholder={$t('common.filters.search_category')} />
+							<Command.Input
+								placeholder={$t('common.filters.search_category')}
+								bind:value={categorySearchTerm}
+								oninput={(e) => handleCategorySearch(e.currentTarget.value)}
+							/>
 							<Command.List>
-								<Command.Empty>{$t('common.filters.no_category_found')}</Command.Empty>
-								<Command.Group>
-									<Command.Item
-										value=""
-										onSelect={() => {
-											selectedCategory = '';
-											if (!isInitialLoad) {
-												currentPage = 1;
-												fetchTransactions();
-											}
-											closeAndFocusTrigger();
-										}}
-									>
-										<CheckIcon
-											class={cn('mr-2 size-4', selectedCategory !== '' && 'text-transparent')}
-										/>
-										{$t('common.all')}
-									</Command.Item>
-									{#each categories as category (category.id)}
+								{#if isLoadingCategories}
+									<Command.Empty>{$t('common.loading')}...</Command.Empty>
+								{:else if categories.length === 0}
+									<Command.Empty>{$t('common.filters.no_category_found')}</Command.Empty>
+								{:else}
+									<Command.Group>
 										<Command.Item
-											value={category.name}
+											value=""
 											onSelect={() => {
-												selectedCategory = category.name;
-												if (!isInitialLoad) {
-													currentPage = 1;
-													fetchTransactions();
-												}
+												changeCategory('');
+												categorySearchTerm = '';
+												// Reset search and reload all categories
+												fetchCategories();
 												closeAndFocusTrigger();
 											}}
 										>
 											<CheckIcon
-												class={cn(
-													'mr-2 size-4',
-													selectedCategory !== category.name && 'text-transparent'
-												)}
+												class={cn('mr-2 size-4', pendingCategory !== '' && 'text-transparent')}
 											/>
-											{category.name}
+											{$t('common.all')}
 										</Command.Item>
-									{/each}
-								</Command.Group>
+										{#each categories as category (category.id)}
+											<Command.Item
+												value={category.name}
+												onSelect={() => {
+													changeCategory(category.name);
+													categorySearchTerm = '';
+													// Reset search and reload all categories
+													fetchCategories();
+													closeAndFocusTrigger();
+												}}
+											>
+												<CheckIcon
+													class={cn(
+														'mr-2 size-4',
+														pendingCategory !== category.name && 'text-transparent'
+													)}
+												/>
+												{category.name}
+											</Command.Item>
+										{/each}
+									</Command.Group>
+								{/if}
 							</Command.List>
 						</Command.Root>
 					</Popover.Content>
 				</Popover.Root>
 			</div>
 
-			<div class="flex justify-start">
+			<div class="flex justify-start gap-2">
 				<Button variant="outline" onclick={resetFilters} size="sm">
 					{$t('common.filters.reset')}
+				</Button>
+				<Button onclick={applyFilters} size="sm">
+					{$t('common.filters.apply')}
 				</Button>
 			</div>
 		</div>
