@@ -52,6 +52,9 @@
 			"view_proof": "View Proof",
 			"close": "Close"
 		},
+		"details": {
+			"dialog_title": "Transaction Details"
+		},
 		"proof": {
 			"dialog_title": "Transaction Proof",
 			"failed_to_load": "Failed to load image",

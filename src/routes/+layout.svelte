@@ -60,7 +60,7 @@
 	<meta name="yandex-verification" content={siteConfig.yandexVerification} />
 </svelte:head>
 
-<ModeWatcher />
+<ModeWatcher defaultMode="light" />
 
 {#if page.error?.message}
 	<Error status={page.status} message={page.error.message} />

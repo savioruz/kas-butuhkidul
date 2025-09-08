@@ -303,10 +303,6 @@
 		pendingCategory = newCategory;
 	}
 
-	function changeItemsPerPage(newLimit: number) {
-		pendingItemsPerPage = newLimit;
-	}
-
 	async function fetchCategories(searchTerm = '') {
 		try {
 			isLoadingCategories = true;
@@ -665,7 +661,10 @@
 					<select
 						id="items-per-page"
 						bind:value={itemsPerPage}
-						on:change={() => changeItemsPerPage(itemsPerPage)}
+						on:change={() => {
+							currentPage = 1;
+							fetchTransactions();
+						}}
 						class="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{#each paginationOptions as option (option)}

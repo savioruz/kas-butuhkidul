@@ -52,6 +52,9 @@
 			"view_proof": "Lihat Bukti",
 			"close": "Tutup"
 		},
+		"details": {
+			"dialog_title": "Detail Transaksi"
+		},
 		"proof": {
 			"dialog_title": "Bukti Transaksi",
 			"failed_to_load": "Gagal memuat gambar",
