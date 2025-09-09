@@ -1,7 +1,7 @@
 {
 	"home": "Home",
-	"products": "Products",
-	"blog": "Blog",
-	"contact": "Contact",
-	"dashboard": "Dashboard"
+	"histories": "Histories",
+	"articles": "Articles",
+	"organizations": "Organizations",
+	"financial": "Financial"
 }

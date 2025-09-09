@@ -1,7 +1,7 @@
 {
 	"home": "Beranda",
-	"products": "Produk",
-	"blog": "Blog",
-	"contact": "Kontak",
-	"dashboard": "Dasbor"
+	"histories": "Sejarah",
+	"articles": "Artikel",
+	"organizations": "Organisasi",
+	"financial": "Kas"
 }

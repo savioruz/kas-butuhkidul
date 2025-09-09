@@ -5,41 +5,96 @@
 	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 	import { siteConfig } from '@/metadata';
+	import { Menu, X } from 'lucide-svelte';
+
+	let isMobileMenuOpen = $state(false);
+
+	function toggleMobileMenu() {
+		isMobileMenuOpen = !isMobileMenuOpen;
+	}
+
+	function closeMobileMenu() {
+		isMobileMenuOpen = false;
+	}
 </script>
 
 <header
 	class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 >
 	<nav class="container mx-auto flex h-14 w-full items-center justify-between px-4 md:px-6">
+		<!-- Logo -->
 		<div class="flex items-center">
 			<a
-				href="/"
+				href={siteConfig.home}
 				class="text-md flex items-center font-bold md:text-lg"
 				data-sveltekit-preload-data
 			>
 				{#if siteConfig.logo}
 					<img src={siteConfig.logo} alt="Logo" class="h-8 w-8 md:h-10 md:w-10" />
 				{/if}
-				<span class="ml-2">{siteConfig.name}</span>
+				<span class="ml-2 truncate">{siteConfig.name}</span>
 			</a>
 		</div>
-		<div class="flex items-center gap-2 md:gap-6">
+
+		<!-- Desktop Navigation -->
+		<div class="hidden items-center gap-6 md:flex">
 			{#each navigationConfig as item (item.href)}
 				{@const isActive = page.url.pathname === item.href}
 				<a
 					href={item.href}
-					class="smooth-transition text-xs font-medium md:text-sm {isActive
+					class="smooth-transition text-sm font-medium {isActive
 						? 'text-gradient'
 						: 'animated-underline'}"
 					data-sveltekit-preload-data
+					data-sveltekit-prefetch
 				>
 					{$t(`navigation.${item.translationKey}`) || item.label}
 				</a>
 			{/each}
-			<div class="ml-2 flex items-center gap-2 md:ml-4">
+			<div class="ml-4 flex items-center gap-2">
 				<ThemeToggle />
 				<LanguageSwitcher />
 			</div>
 		</div>
+
+		<!-- Mobile Menu Controls -->
+		<div class="flex items-center gap-2 md:hidden">
+			<ThemeToggle />
+			<LanguageSwitcher />
+			<button
+				onclick={toggleMobileMenu}
+				class="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-primary focus:outline-none focus:ring-inset"
+				aria-expanded={isMobileMenuOpen}
+				aria-label="Toggle navigation menu"
+			>
+				{#if isMobileMenuOpen}
+					<X class="h-5 w-5" />
+				{:else}
+					<Menu class="h-5 w-5" />
+				{/if}
+			</button>
+		</div>
 	</nav>
+
+	<!-- Mobile Navigation Menu -->
+	{#if isMobileMenuOpen}
+		<div class="border-t border-border/40 bg-background/95 backdrop-blur md:hidden">
+			<div class="container mx-auto space-y-2 px-4 py-3">
+				{#each navigationConfig as item (item.href)}
+					{@const isActive = page.url.pathname === item.href}
+					<a
+						href={item.href}
+						class="block rounded-md px-3 py-2 text-base font-medium transition-colors {isActive
+							? 'bg-accent text-accent-foreground'
+							: 'text-foreground hover:bg-accent hover:text-accent-foreground'}"
+						data-sveltekit-preload-data
+						data-sveltekit-prefetch
+						onclick={closeMobileMenu}
+					>
+						{$t(`navigation.${item.translationKey}`) || item.label}
+					</a>
+				{/each}
+			</div>
+		</div>
+	{/if}
 </header>
