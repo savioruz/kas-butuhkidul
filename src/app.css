@@ -40,7 +40,7 @@
 	--font-sans: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
 	--font-serif: Georgia, 'Times New Roman', serif;
 	--font-mono: monospace;
-	--radius: 0.625rem;
+	--radius: 0rem;
 	--shadow-x: 0px;
 	--shadow-y: 1px;
 	--shadow-blur: 4px;
@@ -186,10 +186,6 @@
 	@apply font-semibold text-primary;
 }
 
-.text-gradient-hover {
-	@apply hover:text-primary;
-}
-
 .smooth-transition {
 	@apply transition-all duration-300 ease-in-out;
 }
@@ -212,13 +208,4 @@
 			@apply border-transparent;
 		}
 	}
-}
-
-.container {
-	width: 100%;
-	margin-left: auto;
-	margin-right: auto;
-	padding-left: 1rem;
-	padding-right: 1rem;
-	max-width: 1280px;
 }
