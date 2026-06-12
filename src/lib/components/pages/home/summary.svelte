@@ -48,7 +48,7 @@
 </script>
 
 <Card
-	class="mx-auto w-[300px] border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 shadow-lg md:w-[400px] dark:border-blue-800 dark:from-blue-950 dark:to-indigo-950"
+	class="mx-auto w-[300px] border-blue-200 bg-blue-50 shadow-lg md:w-[400px] dark:border-blue-800 dark:bg-blue-950"
 >
 	<CardContent class="p-6">
 		{#if isLoading}

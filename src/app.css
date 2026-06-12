@@ -166,12 +166,6 @@
 	--tracking-wide: calc(var(--tracking-normal) + 0.025em);
 	--tracking-wider: calc(var(--tracking-normal) + 0.05em);
 	--tracking-widest: calc(var(--tracking-normal) + 0.1em);
-
-	--background-image-gradient-text: linear-gradient(
-		90deg,
-		var(--color-primary) 0%,
-		var(--color-secondary) 100%
-	);
 }
 
 @layer base {
@@ -185,11 +179,11 @@
 }
 
 .text-gradient {
-	@apply bg-gradient-text bg-clip-text text-transparent;
+	@apply font-semibold text-primary;
 }
 
 .text-gradient-hover {
-	@apply hover:bg-gradient-text hover:bg-clip-text hover:text-transparent;
+	@apply hover:text-primary;
 }
 
 .smooth-transition {
@@ -200,7 +194,7 @@
 	background-size: 0 2px;
 	background-position: 0 100%;
 
-	@apply bg-gradient-to-r from-primary to-secondary bg-no-repeat pb-0.5 no-underline transition-all duration-300 outline-none;
+	@apply bg-gradient-to-r from-primary to-primary bg-no-repeat pb-0.5 no-underline transition-all duration-300 outline-none;
 
 	&.with-dots {
 		@apply border-b border-dotted border-foreground;
